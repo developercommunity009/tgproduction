@@ -27,6 +27,7 @@ const commentRoutes = require('./routes/commentRoutes');
 const imageRoutes = require('./routes/imageUploadRoutes');
 const transactionRoutes = require('./routes/transctionRoute');
 const chartRoutes = require('./routes/chartRoutes');
+// const deployCoinRoutes = require('./routes/deplouCoinRoutes');
 
 // Initialize Express App
 const app = express();
@@ -81,6 +82,7 @@ app.use('/api/v1/comments', commentRoutes);
 app.use('/api/v1/images', imageRoutes); 
 app.use('/api/v1/trnx', transactionRoutes); 
 app.use('/api/v1/chart', chartRoutes ); 
+// app.use('/api/v1/deploy', deployCoinRoutes ); 
 
 // Handle Undefined Routes
 app.all("*", (req, res, next) => {
