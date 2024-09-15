@@ -39,7 +39,7 @@ const DesktopNav = () => {
   useEffect(() => {
     const handleCreateUser = async () => {
       if (address) {
-        await createUser({ wallet: address });
+        await createUser(address);
       }
     };
     handleCreateUser();

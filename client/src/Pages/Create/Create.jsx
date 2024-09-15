@@ -196,7 +196,7 @@ const Create = () => {
             <option value="" disabled>Select a chain</option>
             <option value="ethereum">Ethereum</option>
             <option value="matic">Matic</option>
-            <option value="binancecoin">binancecoin</option>
+            <option value="BSC">BSC</option>
           </select>
           {errors.chain && <p className="text-red-500 text-xs">{errors.chain}</p>}
         </div>

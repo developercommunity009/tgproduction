@@ -72,7 +72,7 @@ const Tokentable = ({ trads }) => {
                     variant="small"
                     className="font-normal text-[#CFC8C8]"
                   >
-                    {tokenQuantity}
+                    {tokenQuantity.toFixed(0)}
                   </Typography>
                 </td>
                 <td className="p-1">

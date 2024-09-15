@@ -1,5 +1,3 @@
-
-
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
@@ -19,14 +17,30 @@ import 'react-toastify/dist/ReactToastify.css';
 const projectId = '3bc9b13ede2c46a106c03bfadb9129e8'
 
 // 2. Set chains
-const chain =
-{
-  chainId: 56,
-  name: "bsc testnet",
-  currency: "BNB",
-  explorerUrl: "https://testnet.bscscan.com/",
-  rpcUrl: "https://bsc-dataseed.binance.org/",
-}
+const chains = [
+  {
+    chainId: 1, // Ethereum Mainnet
+    name: "Ethereum Mainnet",
+    currency: "ETH",
+    explorerUrl: "https://etherscan.io/",
+    rpcUrl: "https://mainnet.infura.io/v3/YOUR_INFURA_PROJECT_ID", // Replace with your Infura or Alchemy project ID
+  },
+  {
+    chainId: 56, // BSC Mainnet
+    name: "Binance Smart Chain",
+    currency: "BNB",
+    explorerUrl: "https://bscscan.com/",
+    rpcUrl: "https://bsc-dataseed.binance.org/",
+  },
+  {
+    chainId: 137, // Polygon Mainnet
+    name: "Polygon Mainnet",
+    currency: "MATIC",
+    explorerUrl: "https://polygonscan.com/",
+    rpcUrl: "https://polygon-rpc.com/",
+  },
+]
+
 // 3. Create modal
 const metadata = {
   name: 'My Website',
@@ -37,13 +51,12 @@ const metadata = {
 
 createWeb3Modal({
   ethersConfig: defaultConfig({ metadata }),
-  chains: [chain],
+  chains,
   projectId,
   enableAnalytics: true // Optional - defaults to your Cloud configuration
 })
 
 const queryClient = new QueryClient()
-
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
@@ -58,4 +71,3 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </QueryClientProvider>
   </React.StrictMode>,
 )
-

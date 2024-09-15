@@ -10,6 +10,7 @@ import { useContext, useEffect, useState } from 'react'
 import { useWeb3ModalAccount } from '@web3modal/ethers5/react'
 import { ContextApi } from '../../Context/ContextApi'
 import Table from '../../Component/Table'
+import { json } from 'd3'
 
 
 const Profile = () => {
@@ -26,7 +27,12 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
 
   const shortenAddress = (addre) => {
-    if (addre !== storedUser.wallet) return 'Connect with own wallet';
+    // Ensure the address and storedUser exist
+    if (!addre || !storedUser?.wallet || addre !== storedUser?.wallet) {
+      return 'Connect with own wallet';
+    }
+  
+    // Safely shorten the address
     return `${addre.slice(0, 6)}...${addre.slice(-4)}`;
   };
 
@@ -209,7 +215,9 @@ const Profile = () => {
                   <h2 class="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
                     {i.name}
                   </h2>
-                  <img className='h-[50px] left-8 bottom-1 absolute' src={i.creator.profilePicture} alt="" />
+                  <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]"> 
+                <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                </div>
                 </div>
                 <div class="p-2 ml-4 mt-4  rounded-b-2xl  grid grid-cols-2 justify-center items-center">
                   <h2 class="text-[12px] leading-5 text-white  font-bold">
@@ -220,7 +228,7 @@ const Profile = () => {
                   <p class=" text-white leading-5 text-[12px] font-bold ">
                     <span className="text-[14px] text-grade font-bold">Market cap:</span>
                     <br />
-                    <span className='text-[#5EEAD4]'> {i.marketCap.toFixed(4)}</span>
+                    <span className='text-[#5EEAD4]'> {i.usdMarketCap.toFixed(0)}</span>
                   </p>
 
                   {/* <p class="text-white leading-5 text-[18px] font-bold "><span className='text-[12px] font-medium'>Symbol:</span><br/>{i.symbol}</p> */}

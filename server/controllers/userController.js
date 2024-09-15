@@ -4,23 +4,24 @@ const catchAsync = require('../utils/catchAsync'); // Adjust the path as necessa
 const AppError = require('../utils/appError'); // Adjust the path as necessary
 const ApiResponse = require('../utils/apiResponse'); // Adjust the path as necessary
 const { emitSocketEvent } = require('../sockets');
+const { ethers } = require('ethers');
 
 
-function isValidEthereumAddress(address) {
-    return /^0x[a-fA-F0-9]{40}$/.test(address);
-}
+// function isValidEthereumAddress(address) {
+//     return /^0x[a-fA-F0-9]{40}$/.test(address);
+// }
 
 
 exports.createUser = catchAsync(async (req, res, next) => {
     const {  wallet } = req.body;
 
     // Check if the wallet is provided
-    if (!wallet) {
+    if(!wallet) {
         return next(new AppError('Wallet is required', 400));
     }
 
     // Validate the wallet address using ethers.js
-    if (!isValidEthereumAddress(wallet)) {
+    if(!ethers.utils.isAddress(wallet)) {
         return next(new AppError('Invalid wallet address', 400));
     }
 

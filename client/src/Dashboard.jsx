@@ -34,7 +34,7 @@ const Dashboard = () => {
   const [selectedChain, setSelectedChain] = useState('All Chains');
   const [activity , setActivity] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-console.log(activity)
+
   const shortenAddress = (addre) => {
     return `${addre.slice(0, 6)}...${addre.slice(-4)}`;
   };
@@ -330,7 +330,7 @@ console.log(data);
                   <div className="px-[20px] border-[#9860FF] rounded-lg border-2 w-full group-hover:text-white group-hover:bg-[#9860FF] py-[13px] space-y-[13px]">
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
                       <h2 className="lg:text-[14px] w-full text-left p-1  text-[12px] hover:text-white hover:bg-[#9860FF] text-[#4A4A4A] font-semibold rounded-md"
-                        onClick={() => handleChainChange()}>
+                        onClick={() => handleChainChange("All chains")}>
                         All Chains
                       </h2>
                     </button>
@@ -368,7 +368,9 @@ console.log(data);
      items-center"
       >
         {data.map((i, index) => (
+     
           <Link key={index} to={`/Trade/${i._id}`}>
+               
             <div
               className="lg:w-[100%]    bg-[#0D0D0D] mx-auto col-span-1 md:w-[16rem]   relative  p-1     transform hover:scale-105 transition-transform duration-300 ease-in-out"
             >
@@ -396,7 +398,10 @@ console.log(data);
                 <h2 className="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
                   {i.name}
                 </h2>
-                <img className='h-[50px] left-8 bottom-1 absolute' src={i.profile} alt="" />
+                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]"> 
+                <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                </div>
+               
               </div>
 
               <div className="p-2 ml-4 mt-4  rounded-b-2xl  grid grid-cols-2 justify-center items-center">
@@ -408,7 +413,7 @@ console.log(data);
                 <p className=" text-white leading-5 text-[12px] font-bold ">
                   <span className="text-[14px] text-grade font-bold">Market cap:</span>
                   <br />
-                  <span className='text-[#5EEAD4]'> {i.marketCap.toFixed(4)}</span>
+                  <span className='text-[#5EEAD4]'> ${i.usdMarketCap.toFixed(0)}</span>
                 </p>
 
                 {/* <p class="text-white leading-5 text-[18px] font-bold "><span className='text-[12px] font-medium'>Symbol:</span><br/>{i.symbol}</p> */}

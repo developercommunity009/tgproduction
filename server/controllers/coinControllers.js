@@ -214,7 +214,7 @@ exports.buyTokens = catchAsync(async (req, res, next) => {
     // Determine the USD value based on the coin's chain
     let usdValue;
     switch (coin.chain.toLowerCase()) {
-        case 'binancecoin':
+        case 'bsc':
             usdValue = priceData?.binancecoin?.usd;
             break;
         case 'ethereum':
@@ -339,7 +339,7 @@ exports.sellTokens = catchAsync(async (req, res, next) => {
     // Determine USD value based on the chain
     let usdValue;
     switch (coin.chain.toLowerCase()) {
-        case 'binancecoin':
+        case 'bsc':
             usdValue = priceData?.binancecoin?.usd;
             break;
         case 'ethereum':
@@ -401,6 +401,7 @@ exports.sellTokens = catchAsync(async (req, res, next) => {
         price: coin.currentPrice,
     });
 
+    emitSocketEvent(req, 'tradeSell', { coin, trxn });
     // Send response
     res.status(200).json(new ApiResponse(200, { coin }, 'Token sold successfully'));
 });

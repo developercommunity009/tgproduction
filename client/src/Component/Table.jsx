@@ -70,7 +70,7 @@ const Table = ({ trxn }) => {
                     variant="small"
                     className="font-normal text-[#CFC8C8]"
                   >
-                    {tokenQuantity.toFixed(4)} {/* Formatted date and time */}
+                    {tokenQuantity.toFixed(0)} {/* Formatted date and time */}
                   </Typography>
                 </td>
                 <td className="p-1">

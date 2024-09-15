@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import Nav from "./Nav"
 import Sidebar from "./Component/Sidebar"
 import Dashboard from "./Dashboard"
@@ -7,6 +7,9 @@ import Buy from './Pages/Buy/Buy'
 import Create from './Pages/Create/Create'
 import Profile from './Pages/Profile/Profile'
 const Screen = () => {
+
+
+
   return (
     <div className=" max-w-[1500px] mx-auto  min-h-screen  overflow-hidden   ">
 

@@ -42,19 +42,24 @@ export const Context = ({ children }) => {
     };
 
     // CREATE User
-    const createUser = async (walletAddress) => {
+    const createUser = async (wallet) => {
+        console.log(wallet)
         try {
-            const response = await axios.post(`${TG_SERVER_URI}/users/`, walletAddress);
+            // Clear local storage at the start of the function
+    
+            const response = await axios.post(`${TG_SERVER_URI}/users/`, {wallet });
+            console.log(response);
             const user = response.data.data.user || response.data.data.existingUser;
-
-            // Save the user data in local storage
+    
+            // Save the new user data in local storage
             localStorage.setItem('user', JSON.stringify(user));
-
+    
             return user;
         } catch (error) {
             throw error;
         }
     };
+    
 
 
     const getUserIdFromLocalStorage = () => {
