@@ -209,7 +209,9 @@ const Profile = () => {
                   <h2 class="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
                     {i.name}
                   </h2>
-                  <img className='h-[50px] left-8 bottom-1 absolute' src={i.creator.profilePicture} alt="" />
+                  <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]"> 
+                <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                </div>
                 </div>
                 <div class="p-2 ml-4 mt-4  rounded-b-2xl  grid grid-cols-2 justify-center items-center">
                   <h2 class="text-[12px] leading-5 text-white  font-bold">
