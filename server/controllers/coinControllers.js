@@ -315,7 +315,7 @@ exports.buyTokens = catchAsync(async (req, res, next) => {
     });
 
     // Emit a socket event
-    emitSocketEvent(req, 'tradeBuy', { coin, trxn });
+    emitSocketEvent(req, 'tradeBuy',  trxn );
 
     // Send response
     res.status(200).json(new ApiResponse(200, { coin }, 'Token bought successfully'));
@@ -422,7 +422,7 @@ exports.sellTokens = catchAsync(async (req, res, next) => {
         price: coin.currentPrice,
     });
 
-    emitSocketEvent(req, 'tradeSell', { coin, trxn });
+    emitSocketEvent(req, 'tradeSell',  trxn );
     // Send response
     res.status(200).json(new ApiResponse(200, { coin }, 'Token sold successfully'));
 });

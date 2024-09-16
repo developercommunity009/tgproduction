@@ -22,7 +22,7 @@ import { SocketProvider, useSocket } from "./Context/SocketContext"
 
 const Dashboard = () => {
 
-  const { filterCoins, data, setData, getAllCoins ,  hils, setHils , getHilCoins } = useContext(ContextApi);
+  const { filterCoins, data, setData, getAllCoins ,  hils, setHils , getHilCoins , getLatestTrxn } = useContext(ContextApi);
   const { socket } = useSocket(SocketProvider);
 
   // const [showNetworks, setshowNetworks] = useState(false);
@@ -97,6 +97,7 @@ const Dashboard = () => {
 
     fetchCoins();
   }, []);
+
   useEffect(() => {
     const fetchCoins = async () => {
       try {
@@ -108,40 +109,43 @@ const Dashboard = () => {
 
     fetchCoins();
   }, []);
+  
+  useEffect(() => {
+    const fetchTrnx = async () => {
+      try {
+      const res =  await getLatestTrxn();
+      setActivity(res)
+      } catch (error) {
+        console.error("Error fetching coins:", error);
+      }
+    };
 
+    fetchTrnx();
+  }, []);
+
+
+  
   useEffect(() => {
     if (socket) {
-      // Listen for buyToken event
+      // Listener for tradeBuy events
       socket.on('tradeBuy', (data) => {
         console.log('Buy token data:', data);
-        // Add the new activity to the current activity list
-        setActivity((prevActivity) => [
-          ...prevActivity,
-          data
-        ]);
+        setActivity((prevActivity) => [...prevActivity, { type: 'buy', ...data }]);
       });
 
-      // Listen for sellToken event
+      // Listener for tradeSell events
       socket.on('tradeSell', (data) => {
         console.log('Sell token data:', data);
-        // Add sell activity
-        setActivity((prevActivity) => [
-          ...prevActivity,
-          data
-        ]);
+        setActivity((prevActivity) => [...prevActivity, { type: 'sell', ...data }]);
       });
 
-      // Listen for createdToken event
+      // Listener for newCoinCreated events
       socket.on('newCoinCreated', (data) => {
         console.log('Created token data:', data);
-        // Add created token activity
-        setActivity((prevActivity) => [
-          ...prevActivity,
-          data
-        ]);
+        setActivity((prevActivity) => [...prevActivity, { type: 'created', ...data }]);
       });
 
-      // Cleanup when component unmounts
+      // Cleanup function to remove listeners
       return () => {
         socket.off('tradeBuy');
         socket.off('tradeSell');
@@ -152,19 +156,9 @@ const Dashboard = () => {
 
   return (
     <div className='lg:px-16 md:px-8  font-poppins pb-24 lg:pb-12  pt-4 md:py-4'>
-      {/* <div className="flex w-full  xl:hidden gap-2 relative rounded-[16px] justify-center">
-        <input
-          type="text"
-          className="bg-grade w-full border-x-2 border-b-2 border-white/50  outline-none placeholder:text-white lg:w-[300px] xl:w-[520px] text-white px-[40px] pr-[20px] py-3 text-[14px] 2xl:text-[18px] font-normal tracking-wide rounded-[12px]"
-          placeholder="Search by creator  "
-        />
-        <div className="absolute top-0 bottom-0 mr-[3px] left-[15px] flex items-center">
-          <MagnifyingGlassIcon className="text-white h-[20px]  mt-[2px]" />
-        </div>
-      </div> */}
       <div className='mt-12'>
         <div className="flex  justify-between items-center ">
-          <h2 className="md:text-[20px] text-white text-[16px] font-bold ">Recent Buys</h2>
+          <h2 className="md:text-[20px] text-white text-[16px] font-bold ">Recent Activities</h2>
 
         </div>
 
@@ -177,18 +171,19 @@ const Dashboard = () => {
               className="flex lg:w-[20%]  items-start  p-2 rounded-md my-2 gap-3 justify-start"
             >
               <div className=" w-[58px]  ">
-                <img className="object-cover rounded-lg  h-[48px] " src={e.coin.image} alt="" />
+                <img className="object-cover rounded-lg  h-[48px] " src={e.coin?.image} alt="" />
               </div>
               <div>
                 <div className='flex gap-4 justify-start items-center'>
                   <h2 className="text-[white]  font-bold cursor-pointer text-[14px]">
-                    {e.trxn.type}
+                    {e.type}{" "}{e.coin?.ticker}
                   </h2>
                   <img className='h-[25px]' src={tick} alt="" />
                 </div>
 
                 <h2 className="text-[#5EEAD4] font-bold text-[14px] ">
-                  {e.trxn.tokenQuantity}
+                {(e.tokenQuantity ?? 0).toFixed(0)}
+
                 </h2>
               </div>
             </div>

@@ -47,20 +47,20 @@ export const Context = ({ children }) => {
 
         try {
             // Clear local storage at the start of the function
-    
-            const response = await axios.post(`${TG_SERVER_URI}/users/`, {wallet });
+
+            const response = await axios.post(`${TG_SERVER_URI}/users/`, { wallet });
             console.log(response);
             const user = response.data.data.user || response.data.data.existingUser;
-    
+
             // Save the new user data in local storage
             localStorage.setItem('user', JSON.stringify(user));
-    
+
             return user;
         } catch (error) {
             throw error;
         }
     };
-    
+
 
 
     const getUserIdFromLocalStorage = () => {
@@ -118,7 +118,7 @@ export const Context = ({ children }) => {
 
 
     // GET CHART DATA BY  COINID 
-    const getChartDataByCoinId  = async (coinId) => {
+    const getChartDataByCoinId = async (coinId) => {
         try {
             const response = await axios.get(`${TG_SERVER_URI}/chart/${coinId}`);
             return response.data;
@@ -185,15 +185,15 @@ export const Context = ({ children }) => {
 
     //GET Candle Data
     const getcoinCandle = async (coinData) => {
-        const {interval ,coinId } = coinData
+        const { interval, coinId } = coinData
         try {
             const response = await axios.get(`${TG_SERVER_URI}/candle/candlesticks`, {
                 params: {
-                  interval: interval,
-                  coinId: coinId
+                    interval: interval,
+                    coinId: coinId
                 }
-              });
-              
+            });
+
             return response.data.data;
         } catch (error) {
             throw error;
@@ -204,6 +204,17 @@ export const Context = ({ children }) => {
     const getTrxnByUser = async (userId) => {
         try {
             const response = await axios.get(`${TG_SERVER_URI}/trnx/user/${userId}`);
+            return response.data.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    //GET  LATEST TRXN 
+    const getLatestTrxn = async (userId) => {
+        try {
+            const response = await axios.get(`${TG_SERVER_URI}/trnx/getlatest`);
+            console.log(response.data.data)
             return response.data.data;
         } catch (error) {
             throw error;
@@ -322,7 +333,8 @@ export const Context = ({ children }) => {
             getCoinHoldres,
             hils,
             setHils,
-            getHilCoins
+            getHilCoins,
+            getLatestTrxn
         }}>
             {children}
         </ContextApi.Provider>
