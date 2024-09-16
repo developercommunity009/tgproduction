@@ -165,10 +165,9 @@ const Dashboard = () => {
         <div className="flex justify-start overflow-x-scroll items-center gap-8 scrollbar">
 
           {activity.map((e, index) => (
-
+          <Link key={index} to={`/Trade/${e.coin?._id}`}>
             <div
-              key={index}
-              className="flex lg:w-[20%]  items-start  p-2 rounded-md my-2 gap-3 justify-start"
+              className="flex lg:w-[100%]  items-start  p-2 rounded-md my-2 gap-3 justify-start"
             >
               <div className=" w-[58px]  ">
                 <img className="object-cover rounded-lg  h-[48px] " src={e.coin?.image} alt="" />
@@ -187,7 +186,7 @@ const Dashboard = () => {
                 </h2>
               </div>
             </div>
-
+            </Link>
           ))}
 
         </div>
