@@ -22,8 +22,8 @@ import { SocketProvider, useSocket } from "./Context/SocketContext"
 
 const Dashboard = () => {
 
-  const { filterCoins, data, setData, getAllCoins } = useContext(ContextApi);
-  const {socket} = useSocket(SocketProvider);
+  const { filterCoins, data, setData, getAllCoins ,  hils, setHils , getHilCoins } = useContext(ContextApi);
+  const { socket } = useSocket(SocketProvider);
 
   // const [showNetworks, setshowNetworks] = useState(false);
   const [showSort, setshowSort] = useState(false);
@@ -32,7 +32,7 @@ const Dashboard = () => {
   const [selectedSort, setSelectedSort] = useState('bump order');
   const [selectedAssending, setSelectedAssending] = useState('Ascending');
   const [selectedChain, setSelectedChain] = useState('All Chains');
-  const [activity , setActivity] = useState([]);
+  const [activity, setActivity] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const shortenAddress = (addre) => {
@@ -74,8 +74,6 @@ const Dashboard = () => {
     }
   };
 
-console.log(data);
-
 
 
 
@@ -99,6 +97,17 @@ console.log(data);
 
     fetchCoins();
   }, []);
+  useEffect(() => {
+    const fetchCoins = async () => {
+      try {
+        await getHilCoins();
+      } catch (error) {
+        console.error("Error fetching coins:", error);
+      }
+    };
+
+    fetchCoins();
+  }, []);
 
   useEffect(() => {
     if (socket) {
@@ -107,7 +116,7 @@ console.log(data);
         console.log('Buy token data:', data);
         // Add the new activity to the current activity list
         setActivity((prevActivity) => [
-          ...prevActivity, 
+          ...prevActivity,
           data
         ]);
       });
@@ -117,7 +126,7 @@ console.log(data);
         console.log('Sell token data:', data);
         // Add sell activity
         setActivity((prevActivity) => [
-          ...prevActivity, 
+          ...prevActivity,
           data
         ]);
       });
@@ -127,7 +136,7 @@ console.log(data);
         console.log('Created token data:', data);
         // Add created token activity
         setActivity((prevActivity) => [
-          ...prevActivity, 
+          ...prevActivity,
           data
         ]);
       });
@@ -153,7 +162,7 @@ console.log(data);
           <MagnifyingGlassIcon className="text-white h-[20px]  mt-[2px]" />
         </div>
       </div> */}
-       <div className='mt-12'>
+      <div className='mt-12'>
         <div className="flex  justify-between items-center ">
           <h2 className="md:text-[20px] text-white text-[16px] font-bold ">Recent Buys</h2>
 
@@ -161,7 +170,7 @@ console.log(data);
 
         <div className="flex justify-start overflow-x-scroll items-center gap-8 scrollbar">
 
-         {activity.map((e, index) => (
+          {activity.map((e, index) => (
 
             <div
               key={index}
@@ -184,7 +193,7 @@ console.log(data);
               </div>
             </div>
 
-          ))} 
+          ))}
 
         </div>
 
@@ -359,22 +368,20 @@ console.log(data);
           </div>
         </div>
       </div>
-
-     
-      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>🔥Hot Token</h2>
+      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>Hil Completed Coins</h2>
       <div
         className="lg:grid flex flex-wrap grid-flow-row mx-auto  lg:grid-cols-3 xl:grid-cols-4 pt-3  !justify-center gap-8
     
      items-center"
       >
-        {data.map((i, index) => (
-     
+        {hils.map((i, index) => (
+
           <Link key={index} to={`/Trade/${i._id}`}>
-               
+
             <div
               className="lg:w-[100%]    bg-[#0D0D0D] mx-auto col-span-1 md:w-[16rem]   relative  p-1     transform hover:scale-105 transition-transform duration-300 ease-in-out"
             >
-             
+
               <div className="flex absolute left-4 top-4 rounded-full p-1 bg-black/30 justify-center items-center gap-2">
                 <img className="h-[20px] object-contain" src={
                   i.chain === "ethereum"
@@ -398,10 +405,72 @@ console.log(data);
                 <h2 className="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
                   {i.name}
                 </h2>
-                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]"> 
-                <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]">
+                  <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
                 </div>
-               
+
+              </div>
+
+              <div className="p-2 ml-4 mt-4  rounded-b-2xl  grid grid-cols-2 justify-center items-center">
+                <h2 className="text-[12px] leading-5 text-white  font-bold">
+                  <span className="text-[14px] text-grade font-bold">Created by:</span>
+                  <br />
+                  <span className='text-[#5EEAD4]'> {shortenAddress(i.creator.wallet)}</span>
+                </h2>
+                <p className=" text-white leading-5 text-[12px] font-bold ">
+                  <span className="text-[14px] text-grade font-bold">Market cap:</span>
+                  <br />
+                  <span className='text-[#5EEAD4]'> ${i.usdMarketCap.toFixed(0)}</span>
+                </p>
+
+                {/* <p class="text-white leading-5 text-[18px] font-bold "><span className='text-[12px] font-medium'>Symbol:</span><br/>{i.symbol}</p> */}
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>🔥Hot Token</h2>
+      <div
+        className="lg:grid flex flex-wrap grid-flow-row mx-auto  lg:grid-cols-3 xl:grid-cols-4 pt-3  !justify-center gap-8
+    
+     items-center"
+      >
+        {data.map((i, index) => (
+
+          <Link key={index} to={`/Trade/${i._id}`}>
+
+            <div
+              className="lg:w-[100%]    bg-[#0D0D0D] mx-auto col-span-1 md:w-[16rem]   relative  p-1     transform hover:scale-105 transition-transform duration-300 ease-in-out"
+            >
+
+              <div className="flex absolute left-4 top-4 rounded-full p-1 bg-black/30 justify-center items-center gap-2">
+                <img className="h-[20px] object-contain" src={
+                  i.chain === "ethereum"
+                    ? ethe
+                    : i.chain === "binancecoin"
+                      ? bnb
+                      : i.chain === "matic"
+                        ? poly
+                        : "path/to/default.png"
+                } alt="" />
+                <h2 className="text-[white]">{i.chain}</h2>
+              </div>
+              <img className='absolute bottom-0 right-0' src={image2} alt="" />
+              <img className='absolute top-0 rotate-180 left-0' src={image2} alt="" />
+              <img
+                className="w-full  h-[7rem] object-cover  rounded-lg"
+                alt="Card Image"
+                src={i.image}
+              />
+              <div className=' flex relative pl-20 flex-row-reverse gap-3 justify-center pt-3 items-center'>
+                <h2 className="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
+                  {i.name}
+                </h2>
+                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]">
+                  <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                </div>
+
               </div>
 
               <div className="p-2 ml-4 mt-4  rounded-b-2xl  grid grid-cols-2 justify-center items-center">

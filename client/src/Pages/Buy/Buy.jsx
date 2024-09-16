@@ -414,7 +414,23 @@ const Buy = () => {
                 {coinData && coinData.description}
               </h1>
             </div>
+            {/* Progress Bar for usdMarketCap */}
+            <div className="w-full bg-gray-300 rounded-full h-2.5 mt-2">
+              <div
+                className="bg-green-600 h-2.5 rounded-full"
+                style={{ width: `${Math.min((coinData?.usdMarketCap / 69000) * 100, 100)}%` }}
+              ></div>
+            </div>
 
+            {/* Display the percentage of the market cap */}
+            <p className="text-white text-sm mt-2">
+              {`${Math.min((coinData?.usdMarketCap / 69000) * 100, 100).toFixed(2)}%`}
+            </p>
+
+            {/* Display the remaining percentage to reach 100% */}
+            <p className="text-white text-sm mt-1">
+              Remaining: {`${Math.max(100 - (coinData?.usdMarketCap / 69000) * 100, 0).toFixed(2)}%`}
+            </p>
           </div>
         </div>
 
@@ -583,7 +599,7 @@ const Buy = () => {
 
           </div>
           <div className="text-[12px] w-full md:w-[49%]  leading-[24px] bg-[#0D0D0D] text-justify mt-2 rounded-lg font-light text-[#CFC8C8] p-4">
-            <div className ='flex justify-between'>
+            <div className='flex justify-between'>
               <h1 className="text-xl font-bold text-white ">Holders</h1>
               <h1 className="text-xl font-bold text-white ">Token Qty</h1>
             </div>
@@ -616,7 +632,7 @@ const Buy = () => {
           </button>
         </div>
       )} */}
-      </div>
+      </div >
     </>
   );
 };

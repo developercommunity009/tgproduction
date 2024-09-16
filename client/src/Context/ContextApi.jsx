@@ -15,6 +15,7 @@ export const Context = ({ children }) => {
     const [storedUser, setstoredUser] = useState('');
 
     const [data, setData] = useState([]);
+    const [hils, setHils] = useState([]);
 
 
     //  UPLOAD IMAGE TO CLOUDNARY
@@ -43,7 +44,7 @@ export const Context = ({ children }) => {
 
     // CREATE User
     const createUser = async (wallet) => {
-        console.log(wallet)
+
         try {
             // Clear local storage at the start of the function
     
@@ -77,6 +78,17 @@ export const Context = ({ children }) => {
         try {
             const response = await axios.get(`${TG_SERVER_URI}/coins/`,);
             setData(response.data.data.coins);
+            return;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    // GET ALL  COINS
+    const getHilCoins = async () => {
+        try {
+            const response = await axios.get(`${TG_SERVER_URI}/coins/hill/coins`,);
+            setHils(response.data.data.coins);
             return;
         } catch (error) {
             throw error;
@@ -307,7 +319,10 @@ export const Context = ({ children }) => {
             getcoinCandle,
             getCoinByHeld,
             getChartDataByCoinId,
-            getCoinHoldres
+            getCoinHoldres,
+            hils,
+            setHils,
+            getHilCoins
         }}>
             {children}
         </ContextApi.Provider>

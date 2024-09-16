@@ -131,6 +131,7 @@ const Profile = () => {
 
 
 
+
   return (
     <div className='lg:px-16 md:px-8 px-4 font-Montserrat mt-36 pb-24 lg:pb-12  py-4 md:py-12'>
 

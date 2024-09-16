@@ -43,7 +43,7 @@ const DesktopNav = () => {
       }
     };
     handleCreateUser();
-  }, [address, createUser]);
+  }, [address]);
 
   // Shorten the address only if it's defined
   const shortAddress = address ? shortenAddress(address) : '';

@@ -48,8 +48,11 @@ exports.getCoin = catchAsync(async (req, res, next) => {
 
 // Get all coins
 exports.getAllCoins = catchAsync(async (req, res, next) => {
-    // Use APIFeatures to apply filtering, sorting, field limiting, and pagination
-    const features = new APIFeatures(Coin.find().populate('creator'), req.query)
+    // Exclude coins with usdMarketCap equal to or greater than 69000
+    const features = new APIFeatures(
+        Coin.find({ usdMarketCap: { $lt: 69000 } }).populate('creator'), 
+        req.query
+    )
         .filter()
         .sort()
         .limitFields()
@@ -62,6 +65,24 @@ exports.getAllCoins = catchAsync(async (req, res, next) => {
     res.status(200).json(new ApiResponse(200, { coins }, 'Coins retrieved successfully'));
 });
 
+// Get Hils coins
+exports.getHilsCoins = catchAsync(async (req, res, next) => {
+    // Only show coins with usdMarketCap equal to or greater than 69000
+    const features = new APIFeatures(
+        Coin.find({ usdMarketCap: { $gte: 69000 } }).populate('creator'), 
+        req.query
+    )
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+
+    const coins = await features.query;
+
+    if (!coins.length) return next(new AppError('Coins not found', 404));
+
+    res.status(200).json(new ApiResponse(200, { coins }, 'Coins retrieved successfully'));
+});
 
 // Get all coins by userID
 exports.getAllCoinsByUserId = catchAsync(async (req, res, next) => {
