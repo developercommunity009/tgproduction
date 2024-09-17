@@ -362,7 +362,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>Hil Completed Coins</h2>
+      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>🏆 Hall Of Fame </h2>
       <div
         className="lg:grid flex flex-wrap grid-flow-row mx-auto  lg:grid-cols-3 xl:grid-cols-4 pt-3  !justify-center gap-8
     
@@ -424,7 +424,7 @@ const Dashboard = () => {
         ))}
       </div>
 
-      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>🔥Hot Token</h2>
+      <h2 className='text-[24px] mt-24 font-semibold text-white text-left'>🔥Hot Token</h2>
       <div
         className="lg:grid flex flex-wrap grid-flow-row mx-auto  lg:grid-cols-3 xl:grid-cols-4 pt-3  !justify-center gap-8
     
