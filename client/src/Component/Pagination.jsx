@@ -4,25 +4,25 @@ import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Pagination = ({ currentPage, onPageChange }) => {
   return (
-    <div className="flex justify-center items-center space-x-12 mt-4">
+    <div className="flex justify-center items-center space-x-12 mt-10">
       {/* Previous Page Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="flex items-center justify-center p-1 rounded-full bg-white border-2 border-[#5cdbd4] shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out disabled:bg-gray-200 disabled:cursor-not-allowed"
+        className="flex items-center justify-center p-1 rounded-lg bg-grade border-2 border-[#9860FF] shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out disabled:bg-gray-200 disabled:cursor-not-allowed"
       >
-        <ArrowBackIosNewIcon className="text-[#20807b]" />
+        <ArrowBackIosNewIcon className="text-white" />
       </button>
 
       {/* Current Page Display */}
-      <span className="text-lg font-bold text-[#20807b]">{currentPage}</span>
+      <span className="text-lg font-bold text-white">{currentPage}</span>
 
       {/* Next Page Button */}
       <button
         onClick={() => onPageChange(currentPage + 1)}
-        className="flex items-center justify-center p-1 rounded-full bg-white border-2 border-[#5cdbd4] shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
+        className="flex items-center justify-center p-1 rounded-lg bg-grade  border-2 border-[#9860FF] shadow-lg hover:scale-105 transition-transform duration-300 ease-in-out"
       >
-        <ArrowForwardIosIcon className="text-[#20807b]" />
+        <ArrowForwardIosIcon className="text-white" />
       </button>
     </div>
   );
