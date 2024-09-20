@@ -38,6 +38,38 @@ exports.createCoin = catchAsync(async (req, res, next) => {
     res.status(201).json(new ApiResponse(201, { coin: newCoin }, 'Coin created successfully'));
 });
 
+
+exports.searchCoins = catchAsync(async (req, res) => {
+    
+    try {
+        const { query } = req.query; // Get the search query from the request
+
+        if (!query) {
+            return next(new AppError('Query parameter is required', 400));
+        }
+
+        // Perform search across multiple fields using $or
+        const coins = await Coin.find({
+            $or: [
+                { name: { $regex: query, $options: 'i' } },            // Search by coin name
+                { ticker: { $regex: query, $options: 'i' } },          // Search by ticker symbol
+                { description: { $regex: query, $options: 'i' } },     // Search by description
+                { chain: { $regex: query, $options: 'i' } },           // Search by blockchain chain
+                { telegramLink: { $regex: query, $options: 'i' } },    // Search by Telegram link
+                { twitterLink: { $regex: query, $options: 'i' } },     // Search by Twitter link
+                { website: { $regex: query, $options: 'i' } },         // Search by website
+                { 'creator.name': { $regex: query, $options: 'i' } },  // Search by creator's name (optional if using populate)
+            ]
+        }).populate('creator'); // Populate creator's name
+
+
+           res.status(200).json(new ApiResponse(201, coins, 'Coin get successfully'));
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
+
 // Get a coin by ID
 exports.getCoin = catchAsync(async (req, res, next) => {
     const coin = await Coin.findById(req.params.id).populate('chartData');

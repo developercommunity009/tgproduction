@@ -16,13 +16,13 @@ import { useState, React, useContext, useEffect } from 'react'
 import { MagnifyingGlassIcon, WalletIcon } from '@heroicons/react/24/solid';
 import { ContextApi } from './Context/ContextApi'
 import { SocketProvider, useSocket } from "./Context/SocketContext"
-
+import Pagination from './Component/Pagination'
 
 
 
 const Dashboard = () => {
 
-  const { filterCoins, data, setData, getAllCoins ,  hils, setHils , getHilCoins , getLatestTrxn } = useContext(ContextApi);
+  const { filterCoins, data, setData, getAllCoins, hils, setHils, getHilCoins, getLatestTrxn } = useContext(ContextApi);
   const { socket } = useSocket(SocketProvider);
 
   // const [showNetworks, setshowNetworks] = useState(false);
@@ -35,9 +35,15 @@ const Dashboard = () => {
   const [activity, setActivity] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+
   const shortenAddress = (addre) => {
+    // Check if addre is valid and is a string
+    if (!addre || typeof addre !== 'string') {
+      return ''; // or you can return a default value or message
+    }
     return `${addre.slice(0, 6)}...${addre.slice(-4)}`;
   };
+
 
   const handlePageChange = async (newPage) => {
     if (newPage > 0) {
@@ -63,6 +69,11 @@ const Dashboard = () => {
   // hello
 
   const handleChainChange = async (chain) => {
+    if(chain === "All Chains"){
+      setSelectedChain("All Chains")
+      await getAllCoins();
+      return
+    }
     setSelectedChain(chain);
     setshowChain(false); // Close the dropdown
     try {
@@ -73,6 +84,8 @@ const Dashboard = () => {
       console.error('Error filtering coins:', error);
     }
   };
+
+
 
 
 
@@ -109,12 +122,12 @@ const Dashboard = () => {
 
     fetchCoins();
   }, []);
-  
+
   useEffect(() => {
     const fetchTrnx = async () => {
       try {
-      const res =  await getLatestTrxn();
-      setActivity(res)
+        const res = await getLatestTrxn();
+        setActivity(res)
       } catch (error) {
         console.error("Error fetching coins:", error);
       }
@@ -124,7 +137,7 @@ const Dashboard = () => {
   }, []);
 
 
-  
+
   useEffect(() => {
     if (socket) {
       // Listener for tradeBuy events
@@ -165,27 +178,27 @@ const Dashboard = () => {
         <div className="flex justify-start overflow-x-scroll items-center gap-8 scrollbar">
 
           {activity.map((e, index) => (
-          <Link key={index} to={`/Trade/${e.coin?._id}`}>
-            <div
-              className="flex lg:w-[100%]  items-start  p-2 rounded-md my-2 gap-3 justify-start"
-            >
-              <div className=" w-[58px]  ">
-                <img className="object-cover rounded-lg  h-[48px] " src={e.coin?.image} alt="" />
-              </div>
-              <div>
-                <div className='flex gap-4 justify-start items-center'>
-                  <h2 className="text-[white]  font-bold cursor-pointer text-[14px]">
-                    {e.type}{" "}{e.coin?.ticker}
-                  </h2>
-                  <img className='h-[25px]' src={tick} alt="" />
+            <Link key={index} to={`/Trade/${e.coin?._id}`}>
+              <div
+                className="flex lg:w-[100%]  items-start  p-2 rounded-md my-2 gap-3 justify-start"
+              >
+                <div className=" w-[58px]  ">
+                  <img className="object-cover rounded-lg  h-[48px] " src={e.coin?.image} alt="" />
                 </div>
+                <div>
+                  <div className='flex gap-4 justify-start items-center'>
+                    <h2 className="text-[white]  font-bold cursor-pointer text-[14px]">
+                      {e.type}{" "}{e.coin?.ticker}
+                    </h2>
+                    <img className='h-[25px]' src={tick} alt="" />
+                  </div>
 
-                <h2 className="text-[#5EEAD4] font-bold text-[14px] ">
-                {(e.tokenQuantity ?? 0).toFixed(0)}
+                  <h2 className="text-[#5EEAD4] font-bold text-[14px] ">
+                    {(e.tokenQuantity ?? 0).toFixed(0)}
 
-                </h2>
+                  </h2>
+                </div>
               </div>
-            </div>
             </Link>
           ))}
 
@@ -333,7 +346,7 @@ const Dashboard = () => {
                   <div className="px-[20px] border-[#9860FF] rounded-lg border-2 w-full group-hover:text-white group-hover:bg-[#9860FF] py-[13px] space-y-[13px]">
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
                       <h2 className="lg:text-[14px] w-full text-left p-1  text-[12px] hover:text-white hover:bg-[#9860FF] text-[#4A4A4A] font-semibold rounded-md"
-                        onClick={() => handleChainChange("All chains")}>
+                        onClick={() => handleChainChange("All Chains")}>
                         All Chains
                       </h2>
                     </button>
@@ -345,8 +358,8 @@ const Dashboard = () => {
                     </button>
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
                       <h2 className="lg:text-[14px] w-full text-left p-1  text-[12px] hover:text-white hover:bg-[#9860FF] text-[#4A4A4A] font-semibold rounded-md"
-                        onClick={() => handleChainChange('binancecoin')}>
-                        BNB
+                        onClick={() => handleChainChange('BSC')}>
+                        BSC
                       </h2>
                     </button>
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
@@ -380,7 +393,7 @@ const Dashboard = () => {
                 <img className="h-[20px] object-contain" src={
                   i.chain === "ethereum"
                     ? ethe
-                    : i.chain === "binancecoin"
+                    : i.chain === "BSC"
                       ? bnb
                       : i.chain === "matic"
                         ? poly
@@ -442,7 +455,7 @@ const Dashboard = () => {
                 <img className="h-[20px] object-contain" src={
                   i.chain === "ethereum"
                     ? ethe
-                    : i.chain === "binancecoin"
+                    : i.chain === "BSC"
                       ? bnb
                       : i.chain === "matic"
                         ? poly
@@ -484,6 +497,14 @@ const Dashboard = () => {
             </div>
           </Link>
         ))}
+          </div>
+        <div className='relative'>
+          {/* Your content here */}
+          <Pagination
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+
       </div>
     </div>
 

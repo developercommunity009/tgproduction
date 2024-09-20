@@ -116,6 +116,19 @@ export const Context = ({ children }) => {
         }
     };
 
+    // GET COINS BY SEARCH
+    const getCoinsBySearch = async (value) => {
+
+        try {
+            const response = await axios.get(`${TG_SERVER_URI}/coins/search`, { params: { query: value } });
+            
+            setData(response.data.data)
+            return response.data.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
 
     // GET CHART DATA BY  COINID 
     const getChartDataByCoinId = async (coinId) => {
@@ -334,7 +347,8 @@ export const Context = ({ children }) => {
             hils,
             setHils,
             getHilCoins,
-            getLatestTrxn
+            getLatestTrxn,
+            getCoinsBySearch
         }}>
             {children}
         </ContextApi.Provider>
