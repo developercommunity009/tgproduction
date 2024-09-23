@@ -38,6 +38,38 @@ exports.createCoin = catchAsync(async (req, res, next) => {
     res.status(201).json(new ApiResponse(201, { coin: newCoin }, 'Coin created successfully'));
 });
 
+
+exports.searchCoins = catchAsync(async (req, res) => {
+    
+    try {
+        const { query } = req.query; // Get the search query from the request
+
+        if (!query) {
+            return next(new AppError('Query parameter is required', 400));
+        }
+
+        // Perform search across multiple fields using $or
+        const coins = await Coin.find({
+            $or: [
+                { name: { $regex: query, $options: 'i' } },            // Search by coin name
+                { ticker: { $regex: query, $options: 'i' } },          // Search by ticker symbol
+                { description: { $regex: query, $options: 'i' } },     // Search by description
+                { chain: { $regex: query, $options: 'i' } },           // Search by blockchain chain
+                { telegramLink: { $regex: query, $options: 'i' } },    // Search by Telegram link
+                { twitterLink: { $regex: query, $options: 'i' } },     // Search by Twitter link
+                { website: { $regex: query, $options: 'i' } },         // Search by website
+                { 'creator.name': { $regex: query, $options: 'i' } },  // Search by creator's name (optional if using populate)
+            ]
+        }).populate('creator'); // Populate creator's name
+
+
+           res.status(200).json(new ApiResponse(201, coins, 'Coin get successfully'));
+    } catch (error) {
+        res.status(500).json({ message: 'Server error', error });
+    }
+});
+
+
 // Get a coin by ID
 exports.getCoin = catchAsync(async (req, res, next) => {
     const coin = await Coin.findById(req.params.id).populate('chartData');
@@ -48,8 +80,11 @@ exports.getCoin = catchAsync(async (req, res, next) => {
 
 // Get all coins
 exports.getAllCoins = catchAsync(async (req, res, next) => {
-    // Use APIFeatures to apply filtering, sorting, field limiting, and pagination
-    const features = new APIFeatures(Coin.find().populate('creator'), req.query)
+    // Exclude coins with usdMarketCap equal to or greater than 69000
+    const features = new APIFeatures(
+        Coin.find({ usdMarketCap: { $lt: 69000 } }).populate('creator'), 
+        req.query
+    )
         .filter()
         .sort()
         .limitFields()
@@ -62,6 +97,24 @@ exports.getAllCoins = catchAsync(async (req, res, next) => {
     res.status(200).json(new ApiResponse(200, { coins }, 'Coins retrieved successfully'));
 });
 
+// Get Hils coins
+exports.getHilsCoins = catchAsync(async (req, res, next) => {
+    // Only show coins with usdMarketCap equal to or greater than 69000
+    const features = new APIFeatures(
+        Coin.find({ usdMarketCap: { $gte: 69000 } }).populate('creator'), 
+        req.query
+    )
+        .filter()
+        .sort()
+        .limitFields()
+        .paginate();
+
+    const coins = await features.query;
+
+    if (!coins.length) return next(new AppError('Coins not found', 404));
+
+    res.status(200).json(new ApiResponse(200, { coins }, 'Coins retrieved successfully'));
+});
 
 // Get all coins by userID
 exports.getAllCoinsByUserId = catchAsync(async (req, res, next) => {
@@ -214,7 +267,7 @@ exports.buyTokens = catchAsync(async (req, res, next) => {
     // Determine the USD value based on the coin's chain
     let usdValue;
     switch (coin.chain.toLowerCase()) {
-        case 'binancecoin':
+        case 'bsc':
             usdValue = priceData?.binancecoin?.usd;
             break;
         case 'ethereum':
@@ -294,7 +347,7 @@ exports.buyTokens = catchAsync(async (req, res, next) => {
     });
 
     // Emit a socket event
-    emitSocketEvent(req, 'tradeBuy', { coin, trxn });
+    emitSocketEvent(req, 'tradeBuy',  trxn );
 
     // Send response
     res.status(200).json(new ApiResponse(200, { coin }, 'Token bought successfully'));
@@ -339,7 +392,7 @@ exports.sellTokens = catchAsync(async (req, res, next) => {
     // Determine USD value based on the chain
     let usdValue;
     switch (coin.chain.toLowerCase()) {
-        case 'binancecoin':
+        case 'bsc':
             usdValue = priceData?.binancecoin?.usd;
             break;
         case 'ethereum':
@@ -401,6 +454,7 @@ exports.sellTokens = catchAsync(async (req, res, next) => {
         price: coin.currentPrice,
     });
 
+    emitSocketEvent(req, 'tradeSell',  trxn );
     // Send response
     res.status(200).json(new ApiResponse(200, { coin }, 'Token sold successfully'));
 });

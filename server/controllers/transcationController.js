@@ -40,3 +40,24 @@ exports.getTransactionsByCoin = catchAsync(async (req, res, next) => {
 
     res.status(200).json(new ApiResponse(200, transactions, 'Transactions retrieved successfully'));
 });
+
+
+exports.getLatestTransactions = catchAsync(async (req, res, next) => {
+    try {
+        const transactions = await Transaction.find()
+            .populate('coin', 'name image ticker') // Populate the coin field
+            .populate('user', 'name email') // Populate the user field
+            .sort({ createdAt: -1 }) // Sort by creation date, newest first
+            .limit(20) // Limit to 20 transactions
+            .exec();
+
+        if (!transactions.length) {
+            return next(new AppError('No transactions found', 404));
+        }
+
+        res.status(200).json(new ApiResponse(200, transactions, 'Latest transactions retrieved successfully'));
+    } catch (error) {
+        console.error('Error retrieving transactions:', error);
+        return next(new AppError('Error retrieving transactions', 500));
+    }
+});

@@ -16,15 +16,21 @@ import { useState, React, useContext, useEffect } from 'react'
 import { MagnifyingGlassIcon, WalletIcon } from '@heroicons/react/24/solid';
 import { ContextApi } from './Context/ContextApi'
 import { SocketProvider, useSocket } from "./Context/SocketContext"
-
+import Pagination from './Component/Pagination'
 
 
 
 const Dashboard = () => {
 
+
+  const { filterCoins, data, setData, getAllCoins, hils, setHils, getHilCoins, getLatestTrxn } = useContext(ContextApi);
+  const { socket } = useSocket(SocketProvider);
+
+
   const { filterCoins, data, setData, getAllCoins } = useContext(ContextApi);
   const {socket} = useSocket(SocketProvider);
 console.log(data)
+
   // const [showNetworks, setshowNetworks] = useState(false);
   const [showSort, setshowSort] = useState(false);
   const [showChain, setshowChain] = useState(false);
@@ -32,12 +38,18 @@ console.log(data)
   const [selectedSort, setSelectedSort] = useState('bump order');
   const [selectedAssending, setSelectedAssending] = useState('Ascending');
   const [selectedChain, setSelectedChain] = useState('All Chains');
-  const [activity , setActivity] = useState([]);
+  const [activity, setActivity] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-console.log(activity)
+
+
   const shortenAddress = (addre) => {
+    // Check if addre is valid and is a string
+    if (!addre || typeof addre !== 'string') {
+      return ''; // or you can return a default value or message
+    }
     return `${addre.slice(0, 6)}...${addre.slice(-4)}`;
   };
+
 
   const handlePageChange = async (newPage) => {
     if (newPage > 0) {
@@ -63,6 +75,11 @@ console.log(activity)
   // hello
 
   const handleChainChange = async (chain) => {
+    if(chain === "All Chains"){
+      setSelectedChain("All Chains")
+      await getAllCoins();
+      return
+    }
     setSelectedChain(chain);
     setshowChain(false); // Close the dropdown
     try {
@@ -74,7 +91,7 @@ console.log(activity)
     }
   };
 
-console.log(data);
+
 
 
 
@@ -101,38 +118,53 @@ console.log(data);
   }, []);
 
   useEffect(() => {
+    const fetchCoins = async () => {
+      try {
+        await getHilCoins();
+      } catch (error) {
+        console.error("Error fetching coins:", error);
+      }
+    };
+
+    fetchCoins();
+  }, []);
+
+  useEffect(() => {
+    const fetchTrnx = async () => {
+      try {
+        const res = await getLatestTrxn();
+        setActivity(res)
+      } catch (error) {
+        console.error("Error fetching coins:", error);
+      }
+    };
+
+    fetchTrnx();
+  }, []);
+
+
+
+  useEffect(() => {
     if (socket) {
-      // Listen for buyToken event
+      // Listener for tradeBuy events
       socket.on('tradeBuy', (data) => {
         console.log('Buy token data:', data);
-        // Add the new activity to the current activity list
-        setActivity((prevActivity) => [
-          ...prevActivity, 
-          data
-        ]);
+        setActivity((prevActivity) => [...prevActivity, { type: 'buy', ...data }]);
       });
 
-      // Listen for sellToken event
+      // Listener for tradeSell events
       socket.on('tradeSell', (data) => {
         console.log('Sell token data:', data);
-        // Add sell activity
-        setActivity((prevActivity) => [
-          ...prevActivity, 
-          data
-        ]);
+        setActivity((prevActivity) => [...prevActivity, { type: 'sell', ...data }]);
       });
 
-      // Listen for createdToken event
+      // Listener for newCoinCreated events
       socket.on('newCoinCreated', (data) => {
         console.log('Created token data:', data);
-        // Add created token activity
-        setActivity((prevActivity) => [
-          ...prevActivity, 
-          data
-        ]);
+        setActivity((prevActivity) => [...prevActivity, { type: 'created', ...data }]);
       });
 
-      // Cleanup when component unmounts
+      // Cleanup function to remove listeners
       return () => {
         socket.off('tradeBuy');
         socket.off('tradeSell');
@@ -143,48 +175,38 @@ console.log(data);
 
   return (
     <div className='lg:px-16 md:px-8  font-poppins pb-24 lg:pb-12  pt-4 md:py-4'>
-      {/* <div className="flex w-full  xl:hidden gap-2 relative rounded-[16px] justify-center">
-        <input
-          type="text"
-          className="bg-grade w-full border-x-2 border-b-2 border-white/50  outline-none placeholder:text-white lg:w-[300px] xl:w-[520px] text-white px-[40px] pr-[20px] py-3 text-[14px] 2xl:text-[18px] font-normal tracking-wide rounded-[12px]"
-          placeholder="Search by creator  "
-        />
-        <div className="absolute top-0 bottom-0 mr-[3px] left-[15px] flex items-center">
-          <MagnifyingGlassIcon className="text-white h-[20px]  mt-[2px]" />
-        </div>
-      </div> */}
-       <div className='mt-12'>
+      <div className='mt-12'>
         <div className="flex  justify-between items-center ">
-          <h2 className="md:text-[20px] text-white text-[16px] font-bold ">Recent Buys</h2>
+          <h2 className="md:text-[20px] text-white text-[16px] font-bold ">Recent Activities</h2>
 
         </div>
 
         <div className="flex justify-start overflow-x-scroll items-center gap-8 scrollbar">
 
-         {activity.map((e, index) => (
-
-            <div
-              key={index}
-              className="flex lg:w-[20%]  items-start  p-2 rounded-md my-2 gap-3 justify-start"
-            >
-              <div className=" w-[58px]  ">
-                <img className="object-cover rounded-lg  h-[48px] " src={e.coin.image} alt="" />
-              </div>
-              <div>
-                <div className='flex gap-4 justify-start items-center'>
-                  <h2 className="text-[white]  font-bold cursor-pointer text-[14px]">
-                    {e.trxn.type}
-                  </h2>
-                  <img className='h-[25px]' src={tick} alt="" />
+          {activity.map((e, index) => (
+            <Link key={index} to={`/Trade/${e.coin?._id}`}>
+              <div
+                className="flex lg:w-[100%]  items-start  p-2 rounded-md my-2 gap-3 justify-start"
+              >
+                <div className=" w-[58px]  ">
+                  <img className="object-cover rounded-lg  h-[48px] " src={e.coin?.image} alt="" />
                 </div>
+                <div>
+                  <div className='flex gap-4 justify-start items-center'>
+                    <h2 className="text-[white]  font-bold cursor-pointer text-[14px]">
+                      {e.type}{" "}{e.coin?.ticker}
+                    </h2>
+                    <img className='h-[25px]' src={tick} alt="" />
+                  </div>
 
-                <h2 className="text-[#5EEAD4] font-bold text-[14px] ">
-                  {e.trxn.tokenQuantity}
-                </h2>
+                  <h2 className="text-[#5EEAD4] font-bold text-[14px] ">
+                    {(e.tokenQuantity ?? 0).toFixed(0)}
+
+                  </h2>
+                </div>
               </div>
-            </div>
-
-          ))} 
+            </Link>
+          ))}
 
         </div>
 
@@ -330,7 +352,11 @@ console.log(data);
                   <div className="px-[20px] border-[#9860FF] rounded-lg border-2 w-full group-hover:text-white group-hover:bg-[#9860FF] py-[13px] space-y-[13px]">
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
                       <h2 className="lg:text-[14px] w-full text-left p-1  text-[12px] hover:text-white hover:bg-[#9860FF] text-[#4A4A4A] font-semibold rounded-md"
+
+                        onClick={() => handleChainChange("All Chains")}>
+
                         onClick={() => handleChainChange("All chains")}>
+
                         All Chains
                       </h2>
                     </button>
@@ -342,8 +368,8 @@ console.log(data);
                     </button>
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
                       <h2 className="lg:text-[14px] w-full text-left p-1  text-[12px] hover:text-white hover:bg-[#9860FF] text-[#4A4A4A] font-semibold rounded-md"
-                        onClick={() => handleChainChange('binancecoin')}>
-                        BNB
+                        onClick={() => handleChainChange('BSC')}>
+                        BSC
                       </h2>
                     </button>
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
@@ -359,27 +385,25 @@ console.log(data);
           </div>
         </div>
       </div>
-
-     
-      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>🔥Hot Token</h2>
+      <h2 className='text-[24px] mt-8 font-semibold text-white text-left'>🏆 Hall Of Fame </h2>
       <div
         className="lg:grid flex flex-wrap grid-flow-row mx-auto  lg:grid-cols-3 xl:grid-cols-4 pt-3  !justify-center gap-8
     
      items-center"
       >
-        {data.map((i, index) => (
-     
+        {hils.map((i, index) => (
+
           <Link key={index} to={`/Trade/${i._id}`}>
-               
+
             <div
               className="lg:w-[100%]    bg-[#0D0D0D] mx-auto col-span-1 md:w-[16rem]   relative  p-1     transform hover:scale-105 transition-transform duration-300 ease-in-out"
             >
-             
+
               <div className="flex absolute left-4 top-4 rounded-full p-1 bg-black/30 justify-center items-center gap-2">
                 <img className="h-[20px] object-contain" src={
                   i.chain === "ethereum"
                     ? ethe
-                    : i.chain === "binancecoin"
+                    : i.chain === "BSC"
                       ? bnb
                       : i.chain === "matic"
                         ? poly
@@ -398,10 +422,10 @@ console.log(data);
                 <h2 className="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
                   {i.name}
                 </h2>
-                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]"> 
-                <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]">
+                  <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
                 </div>
-               
+
               </div>
 
               <div className="p-2 ml-4 mt-4  rounded-b-2xl  grid grid-cols-2 justify-center items-center">
@@ -413,7 +437,7 @@ console.log(data);
                 <p className=" text-white leading-5 text-[12px] font-bold ">
                   <span className="text-[14px] text-grade font-bold">Market cap:</span>
                   <br />
-                  <span className='text-[#5EEAD4]'> {i.marketCap.toFixed(4)}</span>
+                  <span className='text-[#5EEAD4]'> ${i.usdMarketCap.toFixed(0)}</span>
                 </p>
 
                 {/* <p class="text-white leading-5 text-[18px] font-bold "><span className='text-[12px] font-medium'>Symbol:</span><br/>{i.symbol}</p> */}
@@ -421,6 +445,89 @@ console.log(data);
             </div>
           </Link>
         ))}
+      </div>
+
+      <h2 className='text-[24px] mt-24 font-semibold text-white text-left'>🔥Hot Token</h2>
+      <div
+        className="lg:grid flex flex-wrap grid-flow-row mx-auto  lg:grid-cols-3 xl:grid-cols-4 pt-3  !justify-center gap-8
+    
+     items-center"
+      >
+        {data.map((i, index) => (
+
+
+          <Link key={index} to={`/Trade/${i._id}`}>
+
+
+     
+          <Link key={index} to={`/Trade/${i._id}`}>
+               
+
+            <div
+              className="lg:w-[100%]    bg-[#0D0D0D] mx-auto col-span-1 md:w-[16rem]   relative  p-1     transform hover:scale-105 transition-transform duration-300 ease-in-out"
+            >
+
+              <div className="flex absolute left-4 top-4 rounded-full p-1 bg-black/30 justify-center items-center gap-2">
+                <img className="h-[20px] object-contain" src={
+                  i.chain === "ethereum"
+                    ? ethe
+                    : i.chain === "BSC"
+                      ? bnb
+                      : i.chain === "matic"
+                        ? poly
+                        : "path/to/default.png"
+                } alt="" />
+                <h2 className="text-[white]">{i.chain}</h2>
+              </div>
+              <img className='absolute bottom-0 right-0' src={image2} alt="" />
+              <img className='absolute top-0 rotate-180 left-0' src={image2} alt="" />
+              <img
+                className="w-full  h-[7rem] object-cover  rounded-lg"
+                alt="Card Image"
+                src={i.image}
+              />
+              <div className=' flex relative pl-20 flex-row-reverse gap-3 justify-center pt-3 items-center'>
+                <h2 className="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
+                  {i.name}
+                </h2>
+
+                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]">
+                  <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                </div>
+
+
+                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]"> 
+                <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                </div>
+               
+
+              </div>
+
+              <div className="p-2 ml-4 mt-4  rounded-b-2xl  grid grid-cols-2 justify-center items-center">
+                <h2 className="text-[12px] leading-5 text-white  font-bold">
+                  <span className="text-[14px] text-grade font-bold">Created by:</span>
+                  <br />
+                  <span className='text-[#5EEAD4]'> {shortenAddress(i.creator.wallet)}</span>
+                </h2>
+                <p className=" text-white leading-5 text-[12px] font-bold ">
+                  <span className="text-[14px] text-grade font-bold">Market cap:</span>
+                  <br />
+                  <span className='text-[#5EEAD4]'> ${i.usdMarketCap.toFixed(0)}</span>
+                </p>
+
+                {/* <p class="text-white leading-5 text-[18px] font-bold "><span className='text-[12px] font-medium'>Symbol:</span><br/>{i.symbol}</p> */}
+              </div>
+            </div>
+          </Link>
+        ))}
+          </div>
+        <div className='relative'>
+          {/* Your content here */}
+          <Pagination
+            currentPage={currentPage}
+            onPageChange={handlePageChange}
+          />
+
       </div>
     </div>
 

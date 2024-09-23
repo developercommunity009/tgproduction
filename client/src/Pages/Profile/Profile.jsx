@@ -10,6 +10,7 @@ import { useContext, useEffect, useState } from 'react'
 import { useWeb3ModalAccount } from '@web3modal/ethers5/react'
 import { ContextApi } from '../../Context/ContextApi'
 import Table from '../../Component/Table'
+import { json } from 'd3'
 
 
 const Profile = () => {
@@ -26,7 +27,12 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
 
   const shortenAddress = (addre) => {
-    if (addre !== storedUser.wallet) return 'Connect with own wallet';
+    // Ensure the address and storedUser exist
+    if (!addre || !storedUser?.wallet || addre !== storedUser?.wallet) {
+      return 'Connect with own wallet';
+    }
+  
+    // Safely shorten the address
     return `${addre.slice(0, 6)}...${addre.slice(-4)}`;
   };
 
@@ -122,6 +128,7 @@ const Profile = () => {
     };
     result();
   }, []);
+
 
 
 
@@ -222,7 +229,7 @@ const Profile = () => {
                   <p class=" text-white leading-5 text-[12px] font-bold ">
                     <span className="text-[14px] text-grade font-bold">Market cap:</span>
                     <br />
-                    <span className='text-[#5EEAD4]'> {i.marketCap.toFixed(4)}</span>
+                    <span className='text-[#5EEAD4]'> {i.usdMarketCap.toFixed(0)}</span>
                   </p>
 
                   {/* <p class="text-white leading-5 text-[18px] font-bold "><span className='text-[12px] font-medium'>Symbol:</span><br/>{i.symbol}</p> */}

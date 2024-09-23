@@ -177,13 +177,12 @@ const Buy = () => {
 
     // Listen for trade buy events
     socket.on("tradeBuy", (data) => {
-      console.log("Buy event received:", data);
       fetchCoinData(); // Update coin and transaction data
     });
 
     // Listen for trade sell events
     socket.on("tradeSell", (data) => {
-      console.log("Sell event received:", data);
+
       fetchCoinData(); // Update coin and transaction data
     });
 
@@ -262,7 +261,6 @@ const Buy = () => {
     try {
       const res = await sellToken(coinData);
       setCount(0);
-      console.log(res)
       if (res.statusCode === 200) {
         toast.success(res.message);
       }
@@ -279,7 +277,7 @@ const Buy = () => {
 
   const getTokenSymbol = () => {
     switch (coinData?.chain?.toLowerCase()) {
-      case "binancecoin":
+      case "bsc":
         return "BNB";
       case "ethereum":
         return "ETH";
@@ -381,7 +379,7 @@ const Buy = () => {
                 ) : (
                   // If no wallet is connected, display Connect Wallet button
                   <div className="rounded-full mt-3 items-center justify-center flex border-x-2 border-b-2 border-white/50 shadow-lg bg-grade text-white duration-300 cursor-pointer active:scale-[0.98]"
-                  onClick={()=>open()}>
+                    onClick={() => open()}>
                     <button className="px-5 rounded-full py-2">
                       <a href="#">Connect Wallet</a>
                     </button>
@@ -416,7 +414,23 @@ const Buy = () => {
                 {coinData && coinData.description}
               </h1>
             </div>
+            {/* Progress Bar for usdMarketCap */}
+            <div className="w-full bg-gray-300 rounded-full h-2.5 mt-2">
+              <div
+                className="bg-green-600 h-2.5 rounded-full"
+                style={{ width: `${Math.min((coinData?.usdMarketCap / 69000) * 100, 100)}%` }}
+              ></div>
+            </div>
 
+            {/* Display the percentage of the market cap */}
+            <p className="text-white text-sm mt-2">
+              {`${Math.min((coinData?.usdMarketCap / 69000) * 100, 100).toFixed(2)}%`}
+            </p>
+
+            {/* Display the remaining percentage to reach 100% */}
+            <p className="text-white text-sm mt-1">
+              Remaining: {`${Math.max(100 - (coinData?.usdMarketCap / 69000) * 100, 0).toFixed(2)}%`}
+            </p>
           </div>
         </div>
 
@@ -585,7 +599,10 @@ const Buy = () => {
 
           </div>
           <div className="text-[12px] w-full md:w-[49%]  leading-[24px] bg-[#0D0D0D] text-justify mt-2 rounded-lg font-light text-[#CFC8C8] p-4">
-            <h1 className="text-2xl font-bold text-white ">Holders</h1>
+            <div className='flex justify-between'>
+              <h1 className="text-xl font-bold text-white ">Holders</h1>
+              <h1 className="text-xl font-bold text-white ">Token Qty</h1>
+            </div>
             {holders.map((i, index) => (
               <div key={index} className="flex w-full items-center justify-between mt-2 p-2">
                 <div className="flex items-center justify-start">
@@ -595,7 +612,7 @@ const Buy = () => {
 
                   <h1 className="text-[#808080] text-[16px] font-semibold ml-[8px] cursor-pointer">{shortenAddress(i.user.wallet)}</h1>
                 </div>
-                <h1 className="text-white  text-[16px] font-semibold  ">{i.tokenQty.toFixed(2)}</h1>
+                <h1 className="text-white  text-[16px] font-semibold  ">{i.tokenQty.toFixed(0)}</h1>
               </div>
             ))}
           </div>
@@ -615,7 +632,7 @@ const Buy = () => {
           </button>
         </div>
       )} */}
-      </div>
+      </div >
     </>
   );
 };

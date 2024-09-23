@@ -9,45 +9,42 @@ import { ContextApi } from './Context/ContextApi';
 
 
 const DesktopNav = () => {
-  const { createUser, filterCoins, data, setData, getAllCoins } = useContext(ContextApi);
+  const { createUser, getCoinsBySearch } = useContext(ContextApi);
 
+  const [searchTerm, setSearchTerm] = useState('');
   const { address } = useWeb3ModalAccount();
   const { open } = useWeb3Modal();
 
   const shortenAddress = (addre) => {
-    if (!addre) return ''; 
+    if (!addre) return '';
     return `${addre.slice(0, 6)}...${addre.slice(-4)}`;
   };
-
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState([]); 
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        let data = await filterCoins({ ticker: searchQuery });
-        setData(data);
-      } catch (error) {
-        console.error("Error fetching or filtering data", error);
-      }
-    };
-
-    fetchData();
-  }, [searchQuery]);
 
 
   useEffect(() => {
     const handleCreateUser = async () => {
       if (address) {
-        await createUser({ wallet: address });
+        await createUser(address);
       }
     };
     handleCreateUser();
-  }, [address, createUser]);
+  }, [address]);
 
   // Shorten the address only if it's defined
   const shortAddress = address ? shortenAddress(address) : '';
 
+
+  const handleSearch = async (event) => {
+    const value = event.target.value;
+    setSearchTerm(value);
+    if (value) {
+      try {
+        await getCoinsBySearch(value)
+      } catch (error) {
+        console.error('Error searching coins:', error);
+      }
+    }
+  };
 
 
 
@@ -64,10 +61,10 @@ const DesktopNav = () => {
       <div className="flex  gap-2 relative rounded-[16px] justify-center">
         <input
           type="text"
-          className="bg-grade border-x-2 border-b-2 border-white/50  outline-none placeholder:text-white lg:w-[300px] xl:w-[540px] text-white px-[40px] pr-[20px] py-3 text-[14px] 2xl:text-[18px] font-normal tracking-wide rounded-[12px]"
-          placeholder="Search by creator or Collection"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
+          value={searchTerm}
+          onChange={handleSearch}
+          className="bg-grade border-x-2 border-b-2 border-white/50 outline-none placeholder:text-white lg:w-[300px] xl:w-[540px] text-white px-[40px] pr-[20px] py-3 text-[14px] 2xl:text-[18px] font-normal tracking-wide rounded-[12px]"
+          placeholder="Search coins"
         />
         <div className="absolute top-0 bottom-0 mr-[3px] left-[15px] flex items-center">
           <MagnifyingGlassIcon className="text-white h-[20px]  mt-[2px]" />

@@ -15,6 +15,7 @@ export const Context = ({ children }) => {
     const [storedUser, setstoredUser] = useState('');
 
     const [data, setData] = useState([]);
+    const [hils, setHils] = useState([]);
 
 
     //  UPLOAD IMAGE TO CLOUDNARY
@@ -42,12 +43,16 @@ export const Context = ({ children }) => {
     };
 
     // CREATE User
-    const createUser = async (walletAddress) => {
+    const createUser = async (wallet) => {
+
         try {
-            const response = await axios.post(`${TG_SERVER_URI}/users/`, walletAddress);
+            // Clear local storage at the start of the function
+
+            const response = await axios.post(`${TG_SERVER_URI}/users/`, { wallet });
+            console.log(response);
             const user = response.data.data.user || response.data.data.existingUser;
 
-            // Save the user data in local storage
+            // Save the new user data in local storage
             localStorage.setItem('user', JSON.stringify(user));
 
             return user;
@@ -55,6 +60,7 @@ export const Context = ({ children }) => {
             throw error;
         }
     };
+
 
 
     const getUserIdFromLocalStorage = () => {
@@ -73,6 +79,17 @@ export const Context = ({ children }) => {
             const response = await axios.get(`${TG_SERVER_URI}/coins/`,);
             setData(response.data.data.coins);
             console.log(response.data.data.coins);
+            return;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    // GET ALL  COINS
+    const getHilCoins = async () => {
+        try {
+            const response = await axios.get(`${TG_SERVER_URI}/coins/hill/coins`,);
+            setHils(response.data.data.coins);
             return;
         } catch (error) {
             throw error;
@@ -100,9 +117,22 @@ export const Context = ({ children }) => {
         }
     };
 
+    // GET COINS BY SEARCH
+    const getCoinsBySearch = async (value) => {
+
+        try {
+            const response = await axios.get(`${TG_SERVER_URI}/coins/search`, { params: { query: value } });
+            
+            setData(response.data.data)
+            return response.data.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
 
     // GET CHART DATA BY  COINID 
-    const getChartDataByCoinId  = async (coinId) => {
+    const getChartDataByCoinId = async (coinId) => {
         try {
             const response = await axios.get(`${TG_SERVER_URI}/chart/${coinId}`);
             return response.data;
@@ -169,15 +199,15 @@ export const Context = ({ children }) => {
 
     //GET Candle Data
     const getcoinCandle = async (coinData) => {
-        const {interval ,coinId } = coinData
+        const { interval, coinId } = coinData
         try {
             const response = await axios.get(`${TG_SERVER_URI}/candle/candlesticks`, {
                 params: {
-                  interval: interval,
-                  coinId: coinId
+                    interval: interval,
+                    coinId: coinId
                 }
-              });
-              
+            });
+
             return response.data.data;
         } catch (error) {
             throw error;
@@ -188,6 +218,17 @@ export const Context = ({ children }) => {
     const getTrxnByUser = async (userId) => {
         try {
             const response = await axios.get(`${TG_SERVER_URI}/trnx/user/${userId}`);
+            return response.data.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
+    //GET  LATEST TRXN 
+    const getLatestTrxn = async (userId) => {
+        try {
+            const response = await axios.get(`${TG_SERVER_URI}/trnx/getlatest`);
+            console.log(response.data.data)
             return response.data.data;
         } catch (error) {
             throw error;
@@ -303,7 +344,12 @@ export const Context = ({ children }) => {
             getcoinCandle,
             getCoinByHeld,
             getChartDataByCoinId,
-            getCoinHoldres
+            getCoinHoldres,
+            hils,
+            setHils,
+            getHilCoins,
+            getLatestTrxn,
+            getCoinsBySearch
         }}>
             {children}
         </ContextApi.Provider>
