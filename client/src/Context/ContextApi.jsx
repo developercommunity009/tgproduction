@@ -78,6 +78,7 @@ export const Context = ({ children }) => {
         try {
             const response = await axios.get(`${TG_SERVER_URI}/coins/`,);
             setData(response.data.data.coins);
+            console.log(response.data.data.coins);
             return;
         } catch (error) {
             throw error;

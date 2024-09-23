@@ -22,8 +22,14 @@ import Pagination from './Component/Pagination'
 
 const Dashboard = () => {
 
+
   const { filterCoins, data, setData, getAllCoins, hils, setHils, getHilCoins, getLatestTrxn } = useContext(ContextApi);
   const { socket } = useSocket(SocketProvider);
+
+
+  const { filterCoins, data, setData, getAllCoins } = useContext(ContextApi);
+  const {socket} = useSocket(SocketProvider);
+console.log(data)
 
   // const [showNetworks, setshowNetworks] = useState(false);
   const [showSort, setshowSort] = useState(false);
@@ -346,7 +352,11 @@ const Dashboard = () => {
                   <div className="px-[20px] border-[#9860FF] rounded-lg border-2 w-full group-hover:text-white group-hover:bg-[#9860FF] py-[13px] space-y-[13px]">
                     <button className="flex w-full items-center gap-[7px] cursor-pointer">
                       <h2 className="lg:text-[14px] w-full text-left p-1  text-[12px] hover:text-white hover:bg-[#9860FF] text-[#4A4A4A] font-semibold rounded-md"
+
                         onClick={() => handleChainChange("All Chains")}>
+
+                        onClick={() => handleChainChange("All chains")}>
+
                         All Chains
                       </h2>
                     </button>
@@ -445,7 +455,13 @@ const Dashboard = () => {
       >
         {data.map((i, index) => (
 
+
           <Link key={index} to={`/Trade/${i._id}`}>
+
+
+     
+          <Link key={index} to={`/Trade/${i._id}`}>
+               
 
             <div
               className="lg:w-[100%]    bg-[#0D0D0D] mx-auto col-span-1 md:w-[16rem]   relative  p-1     transform hover:scale-105 transition-transform duration-300 ease-in-out"
@@ -474,9 +490,16 @@ const Dashboard = () => {
                 <h2 className="text-[16px]  uppercase text-white  text-center leading-5   font-semibold">
                   {i.name}
                 </h2>
+
                 <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]">
                   <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
                 </div>
+
+
+                <div className="h-[50px] left-5 bottom-1 absolute rounded-full w-[50px]"> 
+                <img className=' rounded-full w-[50px] h-[50px] object-cover' src={i.creator.profilePicture} alt="" />
+                </div>
+               
 
               </div>
 

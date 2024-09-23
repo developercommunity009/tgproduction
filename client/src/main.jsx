@@ -70,4 +70,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </SocketProvider>
     </QueryClientProvider>
   </React.StrictMode>,
+
+)
+
 )
